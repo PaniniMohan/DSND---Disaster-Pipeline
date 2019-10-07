@@ -50,6 +50,10 @@ def load_data(database_filepath):
 
 
 def tokenize(text):
+    """
+    Converts a stream of sentences into individual words. It will take a list and returns an
+    array of clean tokens
+    """
     detected_urls = re.findall(url_regex, text)
     for url in detected_urls:
         text = text.replace(url, "urlplaceholder")
@@ -65,6 +69,10 @@ def tokenize(text):
     return clean_tokens
 
 class StartingVerbExtractor(BaseEstimator, TransformerMixin):
+    """
+    This is a custom transformer. This only looks for the first verb form within the work to execute
+    This is then forwarded into the ML Pipeline
+    """
 
     def starting_verb(self, text):
         sentence_list = nltk.sent_tokenize(text)
@@ -83,6 +91,10 @@ class StartingVerbExtractor(BaseEstimator, TransformerMixin):
         return pd.DataFrame(X_tagged)
 
 def build_model():
+    """
+    The pipeline uses Feature union concept to bind the User defined transformer.
+    """
+    
     model = Pipeline([
         ('features', FeatureUnion([
 
@@ -96,6 +108,9 @@ def build_model():
 
         ('clf', MultiOutputClassifier(AdaBoostClassifier()))
     ])
+    
+    
+ #   As the model is taking higher time with Gridsearch CV, we used only one filter - Max_Df
     
     parameters = {
  #       'features__text_pipeline__vect__ngram_range': ((1, 1), (1, 2)),
